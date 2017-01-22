@@ -19,7 +19,8 @@ public class SuccMenu_Continue : MonoBehaviour {
     public void OnMouseUp() {
         if (Overlapped && MouseDown) {
             Time.timeScale = 1;
-            SceneManager.LoadScene("MainMenu");
+            GameManager.CurrentLevel++;
+            SceneManager.LoadScene("Game");
         }
     }
     public void OnMouseExit() {

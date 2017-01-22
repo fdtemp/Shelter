@@ -113,9 +113,12 @@ public static class GameManager {
     public const float MinWidth = 0.25f;// 宽度最多是长度的二分之一
     public static Vector2 ScreenOrigin = new Vector2(0, 0);
     public static Vector2 ScreenSize = new Vector2(16, 12);
+
+    public static int CurrentLevel = 1;
     public static Catastrophe[] Catastrophes;
     public static float Gold;
     public static float Volume;
+    public static float SuccTime;
 
     //public static Dictionary<string, byte[]> ImageDataDictionary;
     public static Dictionary<int, BrickInfo> Bricks;
@@ -206,10 +209,12 @@ public static class GameManager {
     }
     public static void Failed() {
         Time.timeScale = 0;
+        GameMode = GAMEMODE_WAIT;
         GameObject.Instantiate<GameObject>(FailMenu);
     }
     public static void Success() {
         Time.timeScale = 0;
+        GameMode = GAMEMODE_WAIT;
         GameObject.Instantiate<GameObject>(SuccMenu);
     }
     public static void RefreshCounter(float value, TextMesh TextMesh) {
@@ -238,19 +243,36 @@ public static class GameManager {
         StartTime = Time.time;
         Index = 0;
 
-        Catastrophes = new Catastrophe[] {
-            new Catastrophe.Rockfall(5,2.5f,4,6,13,-1,17,-45,45,Rocks),
-            new Catastrophe.Flood(15,1.3f,7,18,1.8f,true,Waters),
-            new Catastrophe.Flood(15,1.3f,7,-2,1.8f,false,Waters),
-            new Catastrophe.MeteorShower(25,2.5f,4,6,13,-1,17,-45,45,Meteors),
+        switch (CurrentLevel) {
+        case 1:
+            Catastrophes = new Catastrophe[] {
+                new Catastrophe.Rockfall(5,1,10,2,13,-1,17,-45,45,Rocks),
+                new Catastrophe.Flood(5,1.3f,7,18,1.8f,true,Waters),
+                new Catastrophe.Flood(5,1.3f,7,-2,1.8f,false,Waters),
+                new Catastrophe.MeteorShower(5,1,10,2,13,-1,17,-45,45,Meteors),
+            };
+            Gold = 999.99f;
+            Volume = 999.99f;
+            SuccTime = 20;
+            break;
+        case 2:
+            Catastrophes = new Catastrophe[] {
+                new Catastrophe.Rockfall(5,2.5f,4,6,13,-1,17,-45,45,Rocks),
+                new Catastrophe.Flood(15,1.3f,7,18,1.8f,true,Waters),
+                new Catastrophe.Flood(15,1.3f,7,-2,1.8f,false,Waters),
+                new Catastrophe.MeteorShower(25,2.5f,4,6,13,-1,17,-45,45,Meteors),
 
-            new Catastrophe.Rockfall(35,1,10,2,13,-1,17,-45,45,Rocks),
-            new Catastrophe.Flood(35,1.3f,7,18,1.8f,true,Waters),
-            new Catastrophe.Flood(35,1.3f,7,-2,1.8f,false,Waters),
-            new Catastrophe.MeteorShower(35,1,10,2,13,-1,17,-45,45,Meteors),
-        };
-        Gold = 99.99f;
-        Volume = 49.99f;
+                new Catastrophe.Rockfall(35,1,10,2,13,-1,17,-45,45,Rocks),
+                new Catastrophe.Flood(35,1.3f,7,18,1.8f,true,Waters),
+                new Catastrophe.Flood(35,1.3f,7,-2,1.8f,false,Waters),
+                new Catastrophe.MeteorShower(35,1,10,2,13,-1,17,-45,45,Meteors),
+            };
+            Gold = 99.99f;
+            Volume = 49.99f;
+            SuccTime = 50;
+            break;
+        }
+        
     }
     public static void Update() {
         Vector2 MousePos = TransformToWorldPos(Input.mousePosition);
@@ -322,7 +344,7 @@ public static class GameManager {
             }
             break;
         case GAMEMODE_DESTROY:
-            if (CurrentTime > 50f)
+            if (CurrentTime > SuccTime)
                 Success();
             for (int i = 0; i < Catastrophes.Length; i++)
                 Catastrophes[i].Update();
